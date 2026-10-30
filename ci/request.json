@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "mode": "quick",
+  "linux_checks": 942,
+  "full_gate_results": 0,
+  "no_at_bridge": true,
+  "digest": "dc02e8c7cc4e2cc7e54adab53f9c5a24bc20c2399ffe1b30c378d60389f4df07"
+}

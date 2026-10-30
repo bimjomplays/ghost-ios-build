@@ -1,0 +1,31 @@
+/* Camera flow, full screen like the app: every box around Snapchat's preview / taken snap (the boxes it
+   sizes with an inline aspect-ratio, the boxes around those, and the boxes inside them that hold the
+   picture) fills the pane, the picture covers it, and Snapchat's own controls stay on top. */
+html.dg-camera [data-dg-column] div:has([style*="aspect-ratio"]),
+html.dg-camera [data-dg-column] div[style*="aspect-ratio"],
+html.dg-camera [data-dg-column] div[style*="aspect-ratio"] div:has(video, canvas, img[src^="blob:"]) {
+  width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important;
+  margin: 0 !important; padding: 0 !important; border-radius: 0 !important; aspect-ratio: auto !important;
+  border: 0 !important; box-shadow: none !important; inset-inline-start: 0 !important;
+}
+html.dg-camera [data-dg-column] img[src*="bitmoji.com"] { display: none !important; }
+html.dg-camera [data-dg-column] div[style*="aspect-ratio"] :is(video, canvas, img[src^="blob:"]) {
+  width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0 !important;
+  background: #000 !important;
+}
+/* Snapchat's close (x) button: the app's own X in the corner does the same job */
+html.dg-camera [data-dg-column] button[title="Turn off camera"] { visibility: hidden !important; }
+/* Snapchat Web's shutter + lens carousel are desktop-sized: the whole bottom strip is scaled up together
+   (so the selected lens still lines up inside the shutter ring), anchored to the bottom centre */
+html.dg-camera #local-video ~ div {
+  transform: scale(1.8) !important; transform-origin: 50% 100% !important; bottom: 34px !important;
+}
+/* The shutter's row is a full-width box lying over the lens carousel: on a touch screen it swallowed the
+   swipes. Only the shutter itself takes touches now; the carousel under it scrolls with a finger. */
+html.dg-camera #local-video ~ div > div:has([aria-roledescription="draggable"]) { pointer-events: none !important; }
+html.dg-camera #local-video ~ div > div:has([aria-roledescription="draggable"]) > div { pointer-events: auto !important; }
+html.dg-camera #local-video ~ div div:has(> button > img) {
+  overflow-x: scroll !important; -webkit-overflow-scrolling: touch !important; touch-action: pan-x !important;
+  pointer-events: auto !important; scroll-snap-type: x proximity;
+}
+html.dg-camera #local-video ~ div div:has(> button > img) > button { scroll-snap-align: center; }

@@ -1,0 +1,57 @@
+name: Ghost
+options:
+  bundleIdPrefix: com.dltnp
+  deploymentTarget:
+    iOS: "16.0"
+targets:
+  Ghost:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+      - Resources
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleDisplayName: Ghost
+        CFBundleShortVersionString: "1.19.8"
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSRequiresIPhoneOS: true
+        UILaunchScreen:
+          UIColorName: LaunchBG
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+          UISceneConfigurations:
+            UIWindowSceneSessionRoleApplication:
+              - UISceneConfigurationName: Default
+                UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
+        UIUserInterfaceStyle: Dark
+        GhostMode: true
+        CFBundleURLTypes:
+          - CFBundleURLName: com.dltnp.ghost
+            CFBundleURLSchemes: [dltnpghost]
+        CADisableMinimumFrameDurationOnPhone: true
+        UIStatusBarStyle: UIStatusBarStyleLightContent
+        UIViewControllerBasedStatusBarAppearance: true
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        NSCameraUsageDescription: Ghost uses the camera for snaps.
+        NSMicrophoneUsageDescription: Ghost uses the microphone for videos and voice notes.
+        NSPhotoLibraryUsageDescription: Lets you send photos from your library.
+        NSPhotoLibraryAddUsageDescription: Lets you save photos and snaps.
+        NSLocationWhenInUseUsageDescription: Only when you add a weather or location sticker to a snap.
+        NSFaceIDUsageDescription: Face ID unlocks My Eyes Only, your private photos in Ghost.
+        ITSAppUsesNonExemptEncryption: false
+        UIFileSharingEnabled: true
+        UIBackgroundModes: [audio]
+        LSSupportsOpeningDocumentsInPlace: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.dltnp.ghost
+        PRODUCT_NAME: Ghost
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: "AppIconMidnight AppIconSunset AppIconMint AppIconSnap AppIconBerry AppIconGlass"
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGNING_REQUIRED: "NO"
+        CODE_SIGN_IDENTITY: ""

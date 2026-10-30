@@ -1,0 +1,215 @@
+/*
+ * Dark Glass for Snapchat Web (app window only - glass.js adds html.dg-glass).
+ * Same rule as the Spotify theme: glass surfaces are painted pure black / faint white-on-black and the KWin
+ * "glass_key" effect turns them into translucent smoky glass over the desktop blur. Anything brighter than
+ * ~8% renders solid (menus, buttons, text).
+ */
+html.dg-glass[theme="dark"],
+html.dg-glass[theme="dark"] body {
+  --sigBackgroundPrimary: #000 !important;
+  --sigBackgroundSecondary: #000 !important;
+  --sigBackgroundSecondaryRGB: 0, 0, 0 !important;
+  --sigBackgroundSecondaryHover: #121212 !important;
+  --sigBackgroundFeedHover: rgba(255, 255, 255, 0.07) !important;
+  --sigBackgroundMessageHover: rgba(255, 255, 255, 0.035) !important;
+  --sigBackgroundMessageSaved: rgba(94, 94, 237, 0.08) !important;
+  --sigBackgroundMessageSavedHover: rgba(94, 94, 237, 0.12) !important;
+  --sigColorBackgroundBorder: rgba(255, 255, 255, 0.07) !important;
+
+  --sigSurface: #080808 !important;
+  --sigSurfaceRGB: 8, 8, 8 !important;
+  --sigSurfaceDown: #050505 !important;
+  --sigAboveSurface: rgb(30, 30, 34) !important;
+  --sigConversationBoxBackground: rgba(255, 255, 255, 0.07) !important;
+  --sigMediaControlContainerBackground: rgba(255, 255, 255, 0.12) !important;
+
+  /* indigo accent instead of Snapchat blue (brand yellow stays) */
+  /* text: same palette as the Spotify/Discord themes - dim greys looked crunchy on glass */
+  --sigTextPrimary: #f2f2f7 !important;
+  --sigTextSecondary: #b4b4c2 !important;
+  --sigTextTertiary: #8f8f9e !important;
+  --sigIconSecondary: #b4b4c2 !important;
+
+  --sigBrandSecondary: #5e5eed !important;
+  --sigButtonPrimary: #5e5eed !important;
+  --sigButtonPrimaryHover: #7b7bf5 !important;
+  --sigButtonSecondary: rgb(30, 30, 34) !important;
+  --sigButtonSecondaryHover: rgb(42, 42, 48) !important;
+  --sigButtonInactive: rgb(24, 24, 27) !important;
+}
+
+html.dg-glass,
+html.dg-glass body {
+  background: #000 !important;
+  font-family: "Inter", "Noto Sans", sans-serif !important;
+}
+html.dg-glass :is(input, textarea, button) {
+  font-family: "Inter", "Noto Sans", sans-serif !important;
+}
+
+/* keep photos, Bitmoji, snaps and video calls solid */
+html.dg-glass :is(img, video, canvas) {
+  /* Native media colors; no desktop compositor compensation. */
+}
+
+/* scrollbars */
+html.dg-glass ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-radius: 8px !important;
+}
+
+/* elements hidden by glass.js (camera view, promo banners) */
+html.dg-glass [data-dg-hidden] {
+  display: none !important;
+}
+
+/* single-pane layout (glass.js marks root/sidebar/column and sets dg-list / dg-chat) */
+html.dg-glass [data-dg-root] {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+}
+/* photo/video viewer: Snapchat puts it in the top half of the conversation grid ("secondary" row) and the chat in
+   the bottom half - show the viewer over the whole conversation instead (marked by glass.js) */
+html.dg-glass.dg-chat [data-dg-chatgrid] {
+  grid-template-rows: minmax(0, 1fr) !important;
+}
+html.dg-glass.dg-chat [data-dg-chatgrid] > * {
+  grid-row: 1 / -1 !important;
+  grid-column: 1 / -1 !important;
+}
+html.dg-glass.dg-chat [data-dg-viewer] {
+  z-index: 20;
+  height: auto !important;
+  max-height: none !important;
+}
+html.dg-glass [data-dg-root] > :is([data-dg-sidebar], [data-dg-column]) {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 / -1 !important;
+  width: auto !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+}
+html.dg-glass.dg-list:not([data-dg-peek]) [data-dg-column],
+html.dg-glass.dg-chat:not([data-dg-peek]) [data-dg-sidebar] {
+  display: none !important; /* while a chat is dragged (data-dg-peek, gestures.js) both panes show */
+}
+html.dg-glass.dg-list [data-dg-fill] {
+  width: auto !important;
+  margin: 3px 8px !important;
+  height: calc(100% - 6px) !important;
+  box-sizing: border-box !important;
+  border: none !important;
+  border-radius: 14px !important;
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.045) !important;
+}
+
+/* conversation view: flat, full-bleed card and a header on the glass (marked by glass.js) */
+html.dg-glass.dg-chat [data-dg-nopad] {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+html.dg-glass.dg-chat [data-dg-flat] {
+  border-radius: 0 !important;
+  margin: 0 !important;
+  background-color: transparent !important; /* (colour only: the inline background-image is the chat wallpaper) */
+  box-shadow: none !important;
+}
+html.dg-glass.dg-chat [data-dg-header] {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+/* the card margins we removed also held the header buttons off the window edge - put that space back */
+html.dg-glass.dg-chat [data-dg-header] {
+  padding-inline: 12px !important;
+  box-sizing: border-box !important;
+}
+/* ...and the vertical room: with the wrapper padding gone the header collapsed to the button height */
+html.dg-glass.dg-chat [data-dg-header] {
+  height: auto !important;
+  min-height: 60px !important;
+  padding-block: 10px !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+/* list view glass (marked by glass.js glassifyList) */
+html.dg-glass.dg-list [data-dg-clear] {
+  background: transparent !important;
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+/* glass rule: a white overlay must stay well under the ~8% threshold to remain see-through (7.5% read as solid) */
+html.dg-glass.dg-list [data-dg-pill] {
+  background: rgba(255, 255, 255, 0.035) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.045) !important;
+}
+html.dg-glass.dg-list [data-dg-pill]:focus-within {
+  box-shadow: inset 0 0 0 2px #5e5eed !important;
+}
+/* the chat-list pane has a hard-coded #121212 background (not a --sig variable) - make it glass */
+html.dg-glass [data-dg-sidebar] {
+  background: #000 !important; /* clear glass pane; the cards are the frosted, raised part */
+}
+html.dg-glass.dg-list [data-dg-faint] {
+  background-color: rgba(255, 255, 255, 0.035) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
+}
+html.dg-glass.dg-list button[data-dg-faint]:hover {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+/* chat rows (and the virtualized list behind them) carry their own dark fill, which read much darker than the
+   glass above them - make them the same glass, with a faint hover */
+html.dg-glass.dg-list [data-dg-sidebar] :is(.ReactVirtualized__Grid, .ReactVirtualized__List, .ReactVirtualized__Grid__innerScrollContainer) {
+  background: transparent !important;
+}
+html.dg-glass.dg-list [data-dg-fill]::before,
+html.dg-glass.dg-list [data-dg-fill]::after {
+  display: none !important;
+}
+html.dg-glass.dg-list [data-dg-fill]:hover {
+  background-color: rgba(255, 255, 255, 0.065) !important;
+}
+
+/* chat message groups as dark glass bubbles (marked by glass.js markBubbles; Snapchat's grouped corner radii kept) */
+html.dg-glass.dg-chat li[data-dg-bubble] {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.075) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 14px rgba(0, 0, 0, 0.18) !important;
+}
+
+html.dg-glass.dg-list [data-dg-noline] {
+  border-top: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+/* (list width/height are NOT overridden in CSS: the virtualized list only renders rows for the size it measured,
+   so forcing a size left empty areas and hid the stories strip - glass.js makes it re-measure immediately instead) */
+/* stories strip removed (first item of the virtualized list, marked by glass.js); the list is pulled up by its
+   height so the chats start right under the search field (this also removed the divider line it drew) */
+html.dg-glass.dg-list [data-dg-stories] {
+  display: none !important;
+}
+html.dg-glass.dg-list [data-dg-sidebar] .ReactVirtualized__Grid__innerScrollContainer {
+  margin-top: var(--dg-stories-shift, 0px) !important;
+}
+
+/* GIFs (gifs-find.js / gifs-show.js): once the GIF is in, it replaces the "Not Supported on Web" card */
+[data-dg-gif]:has(> .dg-gif) {
+  background: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+[data-dg-gif]:has(> .dg-gif) > :not(.dg-gif) {
+  display: none !important;
+}
+.dg-gif {
+  display: block;
+  width: 240px;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* GIF picker (gif-picker.js): now a Discord-style bottom sheet, styled in ios/Resources/gifs.css (iOS-app
+   only, loaded via App.swift's cssScript, same as chat.css/header.css/etc.) instead of here. */

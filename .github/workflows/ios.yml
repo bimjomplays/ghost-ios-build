@@ -1,0 +1,190 @@
+# Exported to the public build-only repository; never run from the private development repo.
+name: ios
+on:
+  push:
+    branches: ['lane/**']
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [quick, full, release]
+        default: quick
+        description: Release explicitly uploads to TestFlight; main only
+      expected_commit:
+        type: string
+        required: true
+        description: Exact public export SHA approved for this dispatch
+permissions:
+  contents: read
+concurrency:
+  group: ios-${{ github.ref }}-${{ inputs.mode || github.event.head_commit.message }}
+  cancel-in-progress: ${{ inputs.mode == 'quick' || github.event.head_commit.message == 'quick' }}
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.request.outputs.mode }}
+      number: ${{ steps.request.outputs.number }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate immutable export and explicit release request
+        id: request
+        env:
+          REQUESTED_MODE: ${{ inputs.mode }}
+          EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
+        run: |
+          python3 -I ci/public.py
+          python3 -I - <<'PY'
+          import json, os, runpy
+          p = runpy.run_path('ci/public.py')
+          r = json.load(open('ci/request.json'))
+          mode = r['mode']
+          if os.environ['REPOSITORY_PRIVATE'] != 'false':
+              raise SystemExit('Build-only public repository required')
+          if os.environ['GITHUB_EVENT_NAME'] == 'workflow_dispatch':
+              if os.environ['EXPECTED_COMMIT'] != os.environ['GITHUB_SHA']:
+                  raise SystemExit('Public main advanced; dispatch does not match approved export')
+              if os.environ['REQUESTED_MODE'] != mode:
+                  raise SystemExit('Requested mode does not match the exported checks')
+          elif mode == 'release':
+              raise SystemExit('A push can never release')
+          if mode == 'release' and os.environ['GITHUB_REF'] != 'refs/heads/main':
+              raise SystemExit('Release requires main')
+          number = p['build_number'](int(os.environ['GITHUB_RUN_NUMBER']))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f'mode={mode}\nnumber={number}\n')
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: User-facing release notes (nonzero tests required)
+        run: |
+          node ghost/tests/whatsnew.test.cjs > "$RUNNER_TEMP/notes-tests.log"
+          cat "$RUNNER_TEMP/notes-tests.log"
+          grep -q '^PASS' "$RUNNER_TEMP/notes-tests.log"
+          ! grep -q '^FAIL' "$RUNNER_TEMP/notes-tests.log"
+
+  build:
+    needs: validate
+    runs-on: macos-26
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools and generated scripts
+        run: |
+          brew install xcodegen
+          xcodebuild -version
+          python3 -I build-userscripts.py
+          cd ios && xcodegen generate
+      - name: Simulator build (no signed-in account or live Snapchat navigation)
+        env:
+          BUILD_NUMBER: ${{ needs.validate.outputs.number }}
+        run: |
+          xcodebuild -project ios/Ghost.xcodeproj -scheme Ghost -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath "$RUNNER_TEMP/simulator" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' build > "$RUNNER_TEMP/simulator.log" 2>&1 \
+            || { grep -E 'error:' "$RUNNER_TEMP/simulator.log" | head -50; exit 1; }
+      - name: Unsigned device build
+        if: needs.validate.outputs.mode != 'quick'
+        env:
+          BUILD_NUMBER: ${{ needs.validate.outputs.number }}
+        run: |
+          xcodebuild -project ios/Ghost.xcodeproj -scheme Ghost -configuration Release \
+            -destination 'generic/platform=iOS' -derivedDataPath "$RUNNER_TEMP/device" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' build > "$RUNNER_TEMP/device.log" 2>&1 \
+            || { grep -E 'error:' "$RUNNER_TEMP/device.log" | head -50; exit 1; }
+      - name: Verify built identity, version and required resources
+        env:
+          BUILD_NUMBER: ${{ needs.validate.outputs.number }}
+          MODE: ${{ needs.validate.outputs.mode }}
+        run: |
+          python3 -I - <<'PY'
+          import json, os, pathlib, plistlib, re
+          version = re.search(r'CFBundleShortVersionString: "([0-9.]+)"', pathlib.Path('ios/project.yml').read_text())[1]
+          results = []
+          for kind, config in [('simulator', 'Debug-iphonesimulator')] + ([] if os.environ['MODE'] == 'quick' else [('device', 'Release-iphoneos')]):
+              app = pathlib.Path(os.environ['RUNNER_TEMP']) / kind / 'Build/Products' / config / 'Ghost.app'
+              info = plistlib.loads((app / 'Info.plist').read_bytes())
+              assert info['CFBundleIdentifier'] == 'com.dltnp.ghost'
+              assert info['CFBundleShortVersionString'] == version
+              assert info['CFBundleVersion'] == os.environ['BUILD_NUMBER']
+              for name in ['ghost-ui.js', 'ghost-bridge.js', 'hooks.js', 'ui.js', 'settings.js']:
+                  assert (app / name).stat().st_size > 0, name
+              results.append(kind)
+          pathlib.Path('build-receipt.json').write_text(json.dumps({'version': version, 'build': os.environ['BUILD_NUMBER'], 'builds': results, 'native_runtime_tests': 'not configured; private Linux JS tests/rig are the behavior gate'}, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-receipt
+          path: build-receipt.json
+          if-no-files-found: error
+
+  testflight:
+    needs: [validate, build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.mode == 'release' && needs.validate.outputs.mode == 'release'
+    runs-on: macos-26
+    timeout-minutes: 65
+    # Configure this environment for main only and an owner approval. Lanes get no release secrets.
+    environment: testflight
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      ASC_APP_ID: ${{ vars.ASC_APP_ID }}
+      BUILD_NUMBER: ${{ needs.validate.outputs.number }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require scoped signing configuration (never silently skip a release)
+        run: |
+          for name in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8 APPLE_TEAM_ID ASC_APP_ID; do
+            [ -n "${!name}" ] || { echo "::error::Missing $name in the testflight environment"; exit 1; }
+          done
+          umask 077
+          mkdir -p "$RUNNER_TEMP/asc"
+          printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/asc/key.p8"
+      - name: Check App Store Connect app and unused build number
+        run: python3 -I ci/testflight.py preflight
+      - name: Tools and generated scripts
+        run: |
+          brew install xcodegen
+          python3 -I build-userscripts.py
+          cd ios && xcodegen generate
+      - name: Unsigned archive, cloud-managed distribution export and upload
+        run: |
+          xcodebuild -project ios/Ghost.xcodeproj -scheme Ghost -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/Ghost.xcarchive" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Automatic \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" archive > "$RUNNER_TEMP/archive.log" 2>&1 \
+            || { echo '::error::Archive failed; signing/account logs withheld on the public runner'; exit 1; }
+          python3 -I - <<'PY'
+          import os, pathlib, plistlib
+          options = {'method': 'app-store-connect', 'destination': 'upload', 'signingStyle': 'automatic',
+                     'teamID': os.environ['APPLE_TEAM_ID'], 'manageAppVersionAndBuildNumber': False,
+                     'testFlightInternalTestingOnly': False}
+          (pathlib.Path(os.environ['RUNNER_TEMP']) / 'ExportOptions.plist').write_bytes(plistlib.dumps(options))
+          PY
+          # Export signs with the team's cloud-managed distribution identity,
+          # not a development certificate created by an archive on this runner.
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/Ghost.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates -authenticationKeyPath "$RUNNER_TEMP/asc/key.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            > "$RUNNER_TEMP/export.log" 2>&1 \
+            || { echo '::error::Cloud-sign export/upload failed; account logs withheld on the public runner'; exit 1; }
+      - name: Verify processing and attach the same plain-language release notes
+        run: python3 -I ci/testflight.py verify
+      - uses: actions/upload-artifact@v4
+        with:
+          name: testflight-receipt
+          path: testflight-receipt.json
+          if-no-files-found: error
+      - name: Remove ephemeral key, archive, signing/export logs (never public artifacts)
+        if: always()
+        run: |
+          rm -rf "$RUNNER_TEMP/asc" "$RUNNER_TEMP/Ghost.xcarchive" "$RUNNER_TEMP/export"
+          rm -f "$RUNNER_TEMP/ExportOptions.plist" "$RUNNER_TEMP/archive.log" "$RUNNER_TEMP/export.log"

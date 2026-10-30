@@ -1,0 +1,107 @@
+/* Stories, full screen like the app: the photo / video covers the whole pane, Snapchat's header (close,
+   who, when) and reply box float over it, and the left / right sides of the picture are the back /
+   forward tap zones (stories.js) instead of the arrow buttons. */
+html.dg-glass.dg-list.dg-stories [data-dg-column] { padding: 0 !important; }
+html.dg-stories [data-dg-column] div:has(> div > [aria-label="media content"]),
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) {
+  position: relative !important; width: 100% !important; height: 100% !important; max-width: none !important;
+  max-height: none !important; margin: 0 !important; padding: 0 !important; border-radius: 0 !important;
+  background: #000 !important; box-shadow: none !important; border: 0 !important;
+}
+html.dg-stories [data-dg-column] div:has(> div > [aria-label="media content"]) > img { display: none !important; }
+html.dg-stories [data-dg-column] [aria-label="media content"] {
+  position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
+  margin: 0 !important; padding: 0 !important; max-width: none !important; max-height: none !important;
+}
+html.dg-stories [data-dg-column] [aria-label="media content"] div[style*="aspect-ratio"] {
+  position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
+  max-width: none !important; max-height: none !important; aspect-ratio: auto !important;
+  margin: 0 !important; border-radius: 0 !important;
+}
+html.dg-stories [data-dg-column] [aria-label="media content"] :is(img, video, canvas) {
+  width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0 !important;
+}
+/* the arrow buttons stay in the page (the tap zones press them) but out of sight */
+html.dg-stories [data-dg-column] [aria-label="media content"] > div:has(> button),
+html.dg-stories [data-dg-column] [aria-label="media content"] > div:empty {
+  opacity: 0 !important; pointer-events: none !important; position: absolute !important; width: 1px !important; height: 1px !important;
+}
+/* header over the top of the picture, reply box over the bottom */
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child:not([aria-label]) {
+  position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; z-index: 5 !important;
+  padding: 12px 12px 28px !important; box-sizing: border-box !important;
+  background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0)) !important;
+}
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > [aria-label="media content"] ~ div {
+  position: absolute !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 5 !important;
+  padding: 28px 12px 14px !important; box-sizing: border-box !important;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.55)) !important;
+}
+/* header: [chat] [who / when ...] [menu] [x] - the name block takes the free width, bigger and unboxed */
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child:not([aria-label]) {
+  display: flex !important; align-items: center !important; gap: 10px !important; height: auto !important;
+}
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img) {
+  flex: 1 1 auto !important; min-width: 0 !important; max-width: none !important; width: auto !important;
+  margin: 0 !important; position: static !important; transform: none !important;
+}
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img) > div {
+  width: 100% !important; max-width: none !important; background: none !important; box-shadow: none !important;
+  padding: 0 !important; gap: 10px !important; height: auto !important; border: 0 !important;
+}
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child div:has(> img) {
+  width: 44px !important; height: 44px !important; flex: 0 0 44px !important;
+}
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img) > div > div:nth-child(2) {
+  flex: 1 1 auto !important; min-width: 0 !important; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+}
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img) > div > div:nth-child(2) > div:first-child {
+  font-size: 24px !important; line-height: 28px !important; font-weight: 600 !important; color: #fff !important;
+}
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img) > div > div:nth-child(2) > div:nth-child(2),
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img) > div > div:nth-child(2) > div:nth-child(2) * {
+  font-size: 17px !important; line-height: 21px !important; color: rgba(255, 255, 255, 0.85) !important;
+}
+/* reply box: full width */
+html.dg-stories [data-dg-column] [aria-label="media content"] ~ div,
+html.dg-stories [data-dg-column] [aria-label="media content"] ~ div div {
+  width: 100% !important; max-width: none !important; box-sizing: border-box !important;
+}
+html.dg-stories [data-dg-column] [aria-label="media content"] ~ div [contenteditable="true"] { min-height: 46px !important; }
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(> button) {
+  background: none !important; box-shadow: none !important; flex: 0 0 auto !important; border-radius: 0 !important;
+}
+/* the story progress bar runs along the very top: the header row sits under it, and nothing in the name
+   block is clipped */
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child:not([aria-label]) {
+  padding-top: 26px !important; align-items: flex-start !important;
+}
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img),
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img) div,
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img) span {
+  height: auto !important; min-height: 0 !important; max-height: none !important; overflow: visible !important;
+}
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child div:has(> img) {
+  height: 44px !important; overflow: hidden !important;
+}
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img) > div { align-items: center !important; }
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img) > div > div:nth-child(2) > div {
+  white-space: nowrap !important; text-overflow: ellipsis !important; overflow: hidden !important;
+}
+html.dg-stories [data-dg-column] [aria-label="media content"] div:has(> [role="slider"]) { z-index: 6 !important; }
+/* header buttons (chat, menu, close): same size, all centred on one line with the Bitmoji */
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child:not([aria-label]) { align-items: center !important; }
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(> button),
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img) > div > div:has(button),
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child > div:has(img) > div > div:has(button) div {
+  display: flex !important; align-items: center !important; align-self: center !important;
+  margin: 0 !important; padding: 0 !important; position: static !important; transform: none !important;
+}
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child button {
+  width: 40px !important; height: 40px !important; min-width: 40px !important; margin: 0 !important;
+  padding: 0 !important; border-radius: 50% !important; display: flex !important; align-items: center !important;
+  justify-content: center !important; position: static !important; top: auto !important; box-sizing: border-box !important;
+}
+/* the menu's dropdown list still opens under its button */
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child [role="listbox"] { position: absolute !important; }
+html.dg-stories [data-dg-column] div:has(> [aria-label="media content"]) > div:first-child div:has(> [role="listbox"]) { position: relative !important; }
