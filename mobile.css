@@ -1,0 +1,80 @@
+/* Mobile look: Snapchat's own dark mode (its [theme=dark] palette), one flat #121212 background everywhere.
+   Loaded after glass.css, so every glass/black/indigo value there is put back to Snapchat's here. */
+html.dg-glass[theme="dark"], html.dg-glass[theme="dark"] body {
+  color-scheme: dark;
+  background: var(--dg-bg, #121212) !important;
+  --sigBackgroundPrimary: var(--dg-bg, #121212) !important;
+  --sigBackgroundSecondary: var(--dg-surface, #1e1e1e) !important;
+  --sigBackgroundSecondaryRGB: 30, 30, 30 !important;
+  --sigBackgroundSecondaryHover: #2b2b2b !important;
+  --sigBackgroundFeedHover: rgba(255, 255, 255, 0.1) !important;
+  --sigBackgroundMessageHover: #292929 !important;
+  --sigBackgroundMessageSaved: #333232 !important;
+  --sigBackgroundMessageSavedHover: #3a3a3a !important;
+  --sigColorBackgroundBorder: rgba(255, 255, 255, 0.1) !important;
+  --sigSurface: var(--dg-surface, #1e1e1e) !important;
+  --sigSurfaceRGB: 30, 30, 30 !important;
+  --sigSurfaceDown: #212121 !important;
+  --sigAboveSurface: #292929 !important;
+  --sigConversationBoxBackground: var(--dg-surface, #1e1e1e) !important;
+  --sigMediaControlContainerBackground: rgba(255, 255, 255, 0.1) !important;
+  --sigTextPrimary: #dedede !important;
+  --sigTextSecondary: #999 !important;
+  --sigTextTertiary: #616161 !important;
+  --sigIconSecondary: #999 !important;
+  --sigBrandSecondary: #0fadff !important;
+  --sigButtonPrimary: #0fadff !important;
+  --sigButtonPrimaryHover: #42bfff !important;
+  --sigButtonSecondary: #2b2b2b !important;
+  --sigButtonSecondaryHover: #424242 !important;
+  --sigButtonInactive: var(--dg-surface, #1e1e1e) !important;
+  --sigMain: var(--dg-bg, #121212) !important;
+  --sigSubscreen: var(--dg-bg, #121212) !important;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+/* every pane glass.css painted black or see-through: the chat list, its rows, the conversation, headers */
+html.dg-glass :is([data-dg-sidebar], [data-dg-column]),
+html.dg-glass.dg-chat [data-dg-header],
+html.dg-glass.dg-list [data-dg-clear] {
+  background: var(--dg-bg, #121212) !important;
+}
+/* the conversation pane keeps its background-image: that is the chat wallpaper */
+html.dg-glass.dg-chat [data-dg-flat] { background-color: var(--dg-bg, #121212) !important; }
+html.dg-glass.dg-chat [data-dg-header],
+html.dg-glass.dg-list [data-dg-clear] {
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+/* chat list rows: flat and full width with no dividers, like the app, instead of raised cards */
+html.dg-glass.dg-list [data-dg-fill] {
+  margin: 0 !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  background-color: var(--dg-bg, #121212) !important;
+  box-shadow: none !important;
+}
+html.dg-glass.dg-list [data-dg-fill]:hover { background-color: var(--dg-surface, #1e1e1e) !important; }
+/* search field and small buttons: Snapchat's raised grey */
+html.dg-glass.dg-list :is([data-dg-pill], [data-dg-faint]) {
+  background-color: var(--dg-surface, #1e1e1e) !important;
+  box-shadow: none !important;
+}
+html.dg-glass.dg-list [data-dg-pill]:focus-within { box-shadow: inset 0 0 0 2px #0fadff !important; }
+html.dg-glass.dg-list button[data-dg-faint]:hover { background-color: #2b2b2b !important; }
+/* messages: no bubbles, text sits on the background like the app */
+html.dg-glass.dg-chat li[data-dg-bubble] {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+html.dg-glass :is(input, textarea, button) {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+@media (max-width: 600px) {
+  html.dg-glass :is(input, textarea, [contenteditable="true"]) {
+    font-size: 16px !important;
+  }
+  .dg-gif-button { min-width: 44px; min-height: 44px; }
+}
+
+/* gif-anim.js: animated copy laid over a GIF <img> that Safari leaves on its first frame */
+.dg-anim { position: absolute; pointer-events: none; }

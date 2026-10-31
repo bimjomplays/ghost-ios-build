@@ -1,0 +1,71 @@
+/* New Chat sheet styled after the real app: rounded sheet with a grabber and title, tall "To:" pill,
+   "New Group" card, friend cards and one rounded Recents group. SHEET = the fixed box, BOX = its inner div. */
+html.dg-list [data-dg-column] div:has(> div > form [role="searchbox"]) {
+  background: var(--dg-bg, #121212) !important; border-radius: 22px 22px 0 0 !important; overflow: hidden !important;
+}
+html.dg-list [data-dg-column] div:has(> form [role="searchbox"]) { padding-top: 66px !important; position: relative !important; }
+html.dg-list [data-dg-column] div:has(> form [role="searchbox"])::before {
+  content: ""; position: absolute; top: 9px; left: 50%; width: 46px; height: 5px; margin-left: -23px;
+  border-radius: 3px; background: #4a4a4a;
+}
+html.dg-list [data-dg-column] div:has(> form [role="searchbox"])::after {
+  content: "New Chat"; position: absolute; top: 26px; left: 0; right: 0; text-align: center;
+  color: var(--dg-text, #fff); font: 600 23px/1.2 -apple-system, BlinkMacSystemFont, sans-serif;
+  padding-bottom: 12px; border-bottom: 2px solid #2b2b2b;
+}
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div { padding: 14px 18px 0 !important; background: var(--dg-bg, #121212) !important; }
+/* To: pill + New Group card. Snapchat's pill holds [search icon + "To:" field] and the Group button: the
+   pill itself goes transparent and wraps, its first child becomes the pill, the button the card under it. */
+html.dg-list [data-dg-column] form div[role="searchbox"] {
+  display: flex !important; flex-wrap: wrap !important; gap: 14px !important; width: 100% !important;
+  height: auto !important; min-height: 0 !important; padding: 0 !important; overflow: visible !important;
+  background: none !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+}
+html.dg-list [data-dg-column] form div[role="searchbox"] > div:first-child {
+  flex: 1 1 100% !important; min-height: 50px !important; border-radius: 25px !important; background: #2b2b2b !important;
+  padding: 0 22px !important; box-sizing: border-box !important; display: flex !important; align-items: center !important;
+}
+html.dg-list [data-dg-column] form div[role="searchbox"] > div:first-child > svg { display: none !important; }
+html.dg-list [data-dg-column] form div[role="searchbox"] > button {
+  position: static !important; flex: 1 1 100% !important; height: 66px !important; border-radius: 12px !important;
+  background: var(--dg-surface, #1e1e1e) !important; color: var(--dg-text, #fff) !important; justify-content: flex-start !important; margin: 0 !important;
+  padding: 0 22px !important; gap: 18px !important; display: flex !important; align-items: center !important;
+}
+html.dg-list [data-dg-column] form div[role="searchbox"] > button svg { transform: scale(1.5); }
+html.dg-list [data-dg-column] form div[role="searchbox"] > button span { font-size: 0 !important; }
+html.dg-list [data-dg-column] form div[role="searchbox"] > button span::after {
+  content: "New Group"; font: 500 22px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; color: var(--dg-text, #fff);
+}
+html.dg-list [data-dg-column] form div[role="searchbox"] > button::after {
+  content: "\203A"; margin-left: auto; font: 300 34px/1 -apple-system, sans-serif; color: var(--dg-text-secondary, #dedede);
+}
+/* lists (LIST = the form's scrolling ul) */
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul { padding: 4px 0 24px !important; }
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul h2 { margin: 20px 2px 12px !important; padding: 0 !important; }
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul h2 span {
+  font: 700 17px/1.2 -apple-system, BlinkMacSystemFont, sans-serif !important; color: var(--dg-text, #fff) !important;
+}
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul > ul { gap: 6px !important; }
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul li > div:has(img) {
+  min-height: 64px !important; height: auto !important; padding: 6px 12px !important; box-sizing: border-box !important;
+  background: var(--dg-surface, #1e1e1e) !important; border: 0 !important; box-shadow: none !important; gap: 12px !important;
+  align-items: center !important;
+}
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul > ul > li > div { border-radius: 12px !important; }
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul li > div:has(img) div:has(> img) {
+  width: 46px !important; height: 46px !important;
+}
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul li > div:has(img) svg { transform: scale(1.3); }
+/* Recents and the other full-width sections: rounded groups with hairlines */
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul > li > div:has(img) {
+  border-radius: 0 !important; border-bottom: 1px solid #2f2f2f !important; min-height: 68px !important;
+}
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul > li:has(h2) + li > div { border-radius: 12px 12px 0 0 !important; }
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul > li:has(+ li:has(h2)) > div,
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul > li:last-child > div { border-radius: 0 0 12px 12px !important; border-bottom: 0 !important; }
+/* close button sits in the sheet's title row */
+html.dg-list:has([data-dg-column] form [role="searchbox"]) button[data-dg-newchat] { top: 14px !important; right: 14px !important; width: 38px !important; height: 38px !important; }
+/* group avatars (several small Bitmojis) are built differently: grow them to match */
+html.dg-list [data-dg-column] form:has([role="searchbox"]) > div > ul li > div:has(img) > div:first-child:not(:has(> div > img:only-child)) {
+  transform: scale(1.4); margin: 0 8px 0 7px !important;
+}

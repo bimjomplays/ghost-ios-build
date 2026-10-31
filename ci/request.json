@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "mode": "release",
+  "linux_checks": 965,
+  "full_gate_results": 44,
+  "no_at_bridge": true,
+  "deferred_timing": {
+    "policy": "owner-accepted-glass-1.19.9-timing-2026-10-31",
+    "status": "OWNER_ACCEPTED_DEFERRED",
+    "application_digest": "6d1ed02e550fd9e561cbfc306d693adb0c304e8f5b7b5e9720ad05bba31facc8",
+    "run_id": "be43eaf9544a48cd844a3e3534bce5aa",
+    "evidence_digest": "0dca0a7126a7843c656fdd08cd4841468c6c8485305d579220367e036b7daf48",
+    "failures": [
+      {
+        "case": "s1",
+        "scale": 1,
+        "check": "no scripted-scroll frame gap > 50ms",
+        "frames": 2904,
+        "over_budget": 90,
+        "max_gap_ms": 141,
+        "log_sha256": "5a32995cca4f66cfa68c2c5aec6d7888dceccd59c22ba35dcfe8e57fd63942fc",
+        "result_sha256": "1411b4ed44ced104cf17947e45702531282ad3770b82116c778b1e8bebffcb81"
+      },
+      {
+        "case": "s08",
+        "scale": 0.8,
+        "check": "no scripted-scroll frame gap > 50ms",
+        "frames": 2876,
+        "over_budget": 111,
+        "max_gap_ms": 127,
+        "log_sha256": "66fb80e03bdadacb6908021577b950a413318b85e9b5ceb142f36c6aafb25a45",
+        "result_sha256": "947bda40e1347d7d98770f67d837f9587afdb587986b49f115f593b23d3c736e"
+      }
+    ]
+  },
+  "digest": "04643a50b2e11478f96d27250a615c29ce8cd54d72b82a7cf92911cd8505df9b"
+}

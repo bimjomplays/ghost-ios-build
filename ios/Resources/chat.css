@@ -1,0 +1,169 @@
+/* Conversation like the app: plain dark background, messages as dark rounded blocks that hug their text (no
+   coloured side bars, no timestamps), plain header icons, outlined "Send a chat" pill with a white camera. */
+/* no chat wallpaper: plain dark background (the user's choice) */
+html.dg-glass.dg-chat [data-dg-flat] { background-image: none !important; background-color: var(--dg-bg, #121212) !important; }
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] { padding: 6px 10px 10px !important; }
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] > li { margin: 0 !important; padding: 0 !important; }
+/* a sender group = one block: small coloured name on top, that person's messages under it */
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] ul > li[data-dg-ghead] {
+  display: flex !important; flex-direction: column !important; align-items: flex-start !important;
+  background: var(--dg-surface, #1e1e1e) !important; border: 0 !important; box-shadow: none !important;
+  border-radius: 12px !important; padding: 7px 12px 9px !important; margin: 10px 0 0 !important;
+  width: fit-content !important; max-width: 88% !important; box-sizing: border-box !important;
+}
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] ul > li > header {
+  background: none !important; padding: 0 !important; margin: 0 0 2px !important; width: auto !important;
+  min-height: 0 !important; height: auto !important; gap: 0 !important;
+}
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] ul > li > header * { text-transform: none !important; letter-spacing: 0 !important; font-weight: 600 !important; }
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] ul > li > header time,
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] ul > li > header > span { display: none !important; }
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] ul > li > header ~ div {
+  background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important;
+  padding: 2px 0 !important; margin: 0 !important; max-width: 100% !important;
+}
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] ul > li > header ~ div * { border-left-width: 0 !important; }
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] ul > li > header ~ div span[dir] { color: var(--dg-text, #fff) !important; }
+/* a quoted message inside a reply keeps a faint box */
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] ul > li > header ~ div ul > li { background: rgba(255, 255, 255, 0.06) !important; border-radius: 8px !important; padding: 4px 8px !important; }
+/* date separators and status lines: small centred pills */
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] > li > time {
+  display: block !important; width: fit-content !important; margin: 14px auto 6px !important; padding: 4px 12px !important;
+  border-radius: 12px !important; background: var(--dg-surface, #1e1e1e) !important; color: var(--dg-text-secondary, #bbb) !important;
+}
+/* header: plain icons like the app */
+html.dg-glass.dg-chat [data-dg-header] { background: var(--dg-surface, #1b1b1b) !important; box-shadow: none !important; min-height: 66px !important; }
+html.dg-glass.dg-chat [data-dg-header] button { background: none !important; box-shadow: none !important; border: 0 !important; }
+html.dg-glass.dg-chat [data-dg-header] button[title="Open Spotlight"] { display: none !important; }
+html.dg-glass.dg-chat [data-dg-header] button[title="Close Chat"] svg { transform: scale(1.5) !important; }
+html.dg-glass.dg-chat [data-dg-header] [data-dg-hdr-actions] { background: none !important; box-shadow: none !important; border: 0 !important; gap: 18px !important; }
+html.dg-glass.dg-chat [data-dg-header] [data-dg-hdr-actions] > button > span { display: none !important; }
+html.dg-glass.dg-chat [data-dg-header] [data-dg-hdr-actions] > div { display: none !important; }
+html.dg-glass.dg-chat [data-dg-header] [data-dg-hdr-actions] svg { transform: scale(1.55) !important; }
+html.dg-glass.dg-chat [data-dg-header] [data-dg-hdr-actions] svg path { fill: var(--dg-text, #fff) !important; }
+/* input row: one panel in the iOS keyboard's dark grey with rounded top corners, so it reads as part of the
+   keyboard when that is up; bigger, easier buttons */
+html.dg-glass.dg-chat [data-dg-tbwrap] { background: none !important; }
+html.dg-glass.dg-chat [data-dg-cmp-panel],
+html.dg-glass.dg-chat [data-dg-cmp] { background: var(--dg-surface-2, #1c1c1e) !important; }
+html.dg-glass.dg-chat [data-dg-cmp-panel] {
+  border-radius: 20px 20px 0 0 !important; border: 0 !important; border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.35) !important; padding: 0 !important; margin: 0 !important;
+}
+html.dg-glass.dg-chat [data-dg-cmp] {
+  padding: 10px 12px 10px !important; gap: 8px !important; align-items: center !important; border: 0 !important;
+  box-shadow: none !important; border-radius: 20px 20px 0 0 !important;
+}
+html.dg-glass.dg-chat [data-dg-cmp] > button:first-child {
+  width: 50px !important; height: 50px !important; min-width: 50px !important; border-radius: 50% !important; background: #fff !important;
+}
+html.dg-glass.dg-chat [data-dg-cmp] > button:first-child svg path { fill: #1c1c1e !important; }
+html.dg-glass.dg-chat [data-dg-cmp] > button:first-child svg { transform: scale(1.25) !important; }
+html.dg-glass.dg-chat [data-dg-cmp] > [data-dg-cmp-field],
+html.dg-glass.dg-chat [data-dg-cmp] > [data-dg-cmp-field] > div {
+  background: none !important; box-shadow: none !important;
+}
+html.dg-glass.dg-chat [data-dg-cmp] > [data-dg-cmp-field] > div {
+  background: var(--dg-surface-3, #2c2c2e) !important; border: 0 !important; border-radius: 25px !important; min-height: 50px !important;
+  padding: 0 18px !important; display: flex !important; align-items: center !important; box-sizing: border-box !important;
+}
+/* emoji / photo / GIF / send: 48px touch targets, bigger glyphs */
+html.dg-glass.dg-chat [data-dg-cmp] > button:not(:first-child),
+html.dg-glass.dg-chat [data-dg-cmp] > .dg-gif-button {
+  background: none !important; box-shadow: none !important; border: 0 !important;
+  min-width: 48px !important; width: 48px !important; height: 48px !important; padding: 0 !important; margin: 0 !important;
+  display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 50% !important;
+}
+html.dg-glass.dg-chat [data-dg-cmp] > button:not(:first-child) svg { transform: scale(1.5) !important; }
+html.dg-glass.dg-chat [data-dg-cmp] > button:not(:first-child):active { background: rgba(255, 255, 255, 0.12) !important; }
+/* typing starts at the left of the field, like any iOS text field */
+html.dg-glass.dg-chat [data-dg-cmp] > [data-dg-cmp-field] > div {
+  justify-content: flex-start !important; padding: 0 6px 0 18px !important; gap: 8px !important;
+  flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important;
+}
+html.dg-glass.dg-chat [data-dg-column] [role="textbox"][contenteditable="true"] {
+  flex: 1 1 0 !important; min-width: 0 !important; width: auto !important; text-align: left !important; margin: 0 !important;
+  align-self: center !important;
+}
+html.dg-glass.dg-chat [data-dg-column] [role="textbox"][contenteditable="true"]::before,
+html.dg-glass.dg-chat [data-dg-column] [role="textbox"][contenteditable="true"]::after { text-align: left !important; left: 0 !important; right: auto !important; transform: none !important; }
+/* the send arrow (shows while there is text / media): a blue circle inside the right end of the field */
+html.dg-glass.dg-chat [data-dg-cmp] [data-dg-tbanc] button {
+  position: static !important; flex: 0 0 38px !important; min-width: 38px !important; width: 38px !important; height: 38px !important;
+  margin: 0 !important; padding: 0 !important; top: auto !important; right: auto !important; transform: none !important;
+  border-radius: 50% !important; background: var(--dg-accent, #0fadff) !important; align-self: center !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+}
+html.dg-glass.dg-chat [data-dg-cmp] [data-dg-tbanc] button svg { transform: scale(1.05) !important; }
+html.dg-glass.dg-chat [data-dg-cmp] [data-dg-tbanc] button svg path { fill: #fff !important; }
+/* header: a little bigger all round (the name's size comes from textscale.js) */
+html.dg-glass.dg-chat [data-dg-header] { min-height: 74px !important; }
+html.dg-glass.dg-chat [data-dg-header] button[title="Close Chat"] svg { transform: scale(1.85) !important; }
+html.dg-glass.dg-chat [data-dg-header] [data-dg-hdr-actions] { gap: 26px !important; padding-right: 8px !important; }
+html.dg-glass.dg-chat [data-dg-header] [data-dg-hdr-actions] svg { transform: scale(1.95) !important; }
+html.dg-glass.dg-chat [data-dg-header] button[aria-label] { transform: scale(1.22) !important; transform-origin: left center !important; margin: 0 !important; }
+/* room for the enlarged Bitmoji so it doesn't sit on the name */
+html.dg-glass.dg-chat [data-dg-header] [data-dg-hdr-avwrap] { margin: 0 20px 0 8px !important; flex: 0 0 auto !important; overflow: visible !important; }
+html.dg-glass.dg-chat [data-dg-header] [data-dg-hdr-av2] { gap: 0 !important; overflow: visible !important; }
+/* follow-up messages from the same person (no name line): the same block look, tucked close */
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] > li > div > ul > li[data-dg-gfollow] {
+  background: var(--dg-surface, #1e1e1e) !important; border: 0 !important; box-shadow: none !important;
+  border-radius: 12px !important; padding: 6px 12px 8px !important; margin: 3px 0 0 !important;
+  width: fit-content !important; max-width: 88% !important; box-sizing: border-box !important;
+}
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] > li > div > ul > li[data-dg-gfollow] > div {
+  background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important;
+}
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] > li > div > ul > li[data-dg-gfollow] * { border-left-width: 0 !important; }
+html.dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] > li > div > ul > li[data-dg-gfollow] span[dir] { color: var(--dg-text, #fff) !important; }
+/* send arrow pinned to the right end of the field, whatever wraps it */
+html.dg-glass.dg-chat [data-dg-cmp] > [data-dg-cmp-field] > div > [data-dg-sendwrap],
+html.dg-glass.dg-chat [data-dg-cmp] > [data-dg-cmp-field] > div > button {
+  order: 9 !important; margin-left: auto !important; flex: 0 0 auto !important; position: static !important; align-self: center !important;
+}
+/* the Bitmoji is absolutely placed and the name sits beside it with a fixed indent: push the name over */
+html.dg-glass.dg-chat [data-dg-header] [data-dg-hdr-av2] > [data-dg-hdr-name] { margin-left: 64px !important; } /* Snapchat's own indent is 46px for a 36px Bitmoji */
+/* Replying to a message: Snapchat puts the quoted message (a whole sender group: header + bubble) inside the
+   message field, in front of the textbox. In our one-line pill it sat in the same row, enlarged by textscale,
+   and squeezed the typing area (device report 2026-09-21). It now gets its own compact line above the text:
+   a two-line quote with a blue bar and a small grey close button; the textbox keeps the full width below. */
+html.dg-glass.dg-chat [data-dg-cmp] [data-dg-replying] {
+  flex-wrap: wrap !important; border-radius: 22px !important; padding-top: 8px !important; padding-bottom: 4px !important;
+}
+html.dg-glass.dg-chat [data-dg-cmp] [data-dg-quote] {
+  order: -1 !important; flex: 0 0 100% !important; width: 100% !important; max-width: 100% !important; max-height: 58px !important;
+  overflow: hidden !important; position: relative !important; box-sizing: border-box !important; margin: 0 0 4px !important;
+  padding: 5px 36px 5px 10px !important; border: 0 !important; border-left: 3px solid var(--dg-accent, #0fadff) !important; border-radius: 8px !important;
+  background: var(--dg-surface-2, #1c1c1e) !important; box-shadow: none !important;
+}
+html.dg-glass.dg-chat [data-dg-cmp] [data-dg-quote] * {
+  font-size: 14px !important; line-height: 18px !important; margin: 0 !important; padding: 0 !important; border: 0 !important;
+  background: none !important; box-shadow: none !important; max-width: 100% !important; min-height: 0 !important;
+}
+html.dg-glass.dg-chat [data-dg-cmp] [data-dg-quote] ul, html.dg-glass.dg-chat [data-dg-cmp] [data-dg-quote] li { list-style: none !important; }
+html.dg-glass.dg-chat [data-dg-cmp] [data-dg-quote] header { font-size: 12px !important; opacity: 0.85 !important; }
+html.dg-glass.dg-chat [data-dg-cmp] [data-dg-quote] header time, html.dg-glass.dg-chat [data-dg-cmp] [data-dg-quote] img { display: none !important; }
+html.dg-glass.dg-chat [data-dg-cmp] [data-dg-quote] button {
+  position: absolute !important; top: 6px !important; right: 6px !important; width: 26px !important; min-width: 26px !important; height: 26px !important;
+  flex: none !important; border-radius: 50% !important; background: #3a3a3c !important; order: 0 !important; margin: 0 !important; z-index: 2 !important;
+}
+html.dg-glass.dg-chat [data-dg-cmp] [data-dg-quote] button svg { width: 12px !important; height: 12px !important; transform: none !important; }
+
+/* Message style "Compact" (Look setting; "Blocks" above is the default and unchanged). Tighter bubble
+   padding/spacing and a smaller name line. The per-message font-size/line-height are set inline by
+   textscale.js with !important - an inline declaration always wins a specificity tie against any
+   selector-based rule even under !important, so a stylesheet rule can't shrink that text's font-size; the
+   name line is scaled down instead, which textscale.js never touches. */
+html[data-dg-compact].dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] ul > li[data-dg-ghead] {
+  padding: 4px 10px 5px !important; margin: 4px 0 0 !important;
+}
+html[data-dg-compact].dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] ul > li > header {
+  transform: scale(0.85) !important; transform-origin: left center !important; margin-bottom: -2px !important;
+}
+html[data-dg-compact].dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] > li > div > ul > li[data-dg-gfollow] {
+  padding: 3px 10px 4px !important; margin: 1px 0 0 !important;
+}
+html[data-dg-compact].dg-glass.dg-chat [data-dg-flat] ul[id^="cv-"] > li > time {
+  margin: 8px auto 4px !important; padding: 3px 10px !important;
+}
+
