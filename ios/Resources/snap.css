@@ -1,0 +1,27 @@
+/* Taken snap (photo or video) before sending: app-sized controls. Bottom row = Download + Send To. */
+html.dg-camera #snap-preview-container { width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; border-radius: 0 !important; }
+html.dg-camera #snap-preview-container > div:last-child:has(> button) {
+  position: absolute !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 6 !important;
+  display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 12px !important;
+  padding: 40px 18px 26px !important; box-sizing: border-box !important; height: auto !important; width: 100% !important;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6)) !important;
+}
+html.dg-camera #snap-preview-container > div:last-child:has(> button) > button {
+  height: 62px !important; min-width: 62px !important; padding: 0 26px !important; border-radius: 31px !important;
+  gap: 10px !important; display: flex !important; align-items: center !important; justify-content: center !important;
+}
+html.dg-camera #snap-preview-container > div:last-child:has(> button) > button span {
+  font-size: 23px !important; line-height: 28px !important; font-weight: 600 !important;
+}
+html.dg-camera #snap-preview-container > div:last-child:has(> button) > button svg { transform: scale(1.5) !important; }
+html.dg-camera #snap-preview-container > div:last-child:has(> button) > button:last-child {
+  background: var(--dg-accent, #0fadff) !important; color: #fff !important; padding: 0 30px !important;
+}
+/* top tools (close, caption, ...): bigger round buttons */
+html.dg-camera #snap-preview-container > div:first-child > button,
+html.dg-camera #snap-preview-container > div:first-child div:has(> button) > button {
+  width: 52px !important; height: 52px !important; border-radius: 50% !important;
+}
+html.dg-camera #snap-preview-container > div:first-child button svg { transform: scale(1.35) !important; }
+html.dg-camera #snap-preview-container > div:first-child > button:first-child { top: 14px !important; left: 14px !important; }
+html.dg-camera #snap-preview-container > div:last-child:has(> button) > button { margin-bottom: 22px !important; }

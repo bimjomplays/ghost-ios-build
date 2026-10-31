@@ -1,0 +1,52 @@
+/* App only: swipe/long-press gestures (gestures.js). Follow-the-finger movement is done with inline
+   transforms set by JS (no transition while dragging, a short one when it springs back or leaves) - this
+   file only needs to keep dragging cheap and make Snapchat's own revealed action menu touch-sized. */
+
+html.dg-glass.dg-list [data-dg-sidebar] [data-dg-fill] { will-change: transform; }
+html.dg-glass.dg-chat li[data-dg-bubble] { will-change: transform; }
+
+/* Snapchat's own message menu (reactions row + Save in Chat / Reply / Delete ...), opened by gestures.js with a
+   real right click. Structure from a device dump (actionmenu-*.html, 2026-09-21):
+   #portal-container > div(backdrop, click closes) > div(left/top inline, at the click point) > div > ul > li > button > img
+                                                                                              > div > div(svg + span)
+   Run12/13 turned it into a bottom sheet; the user prefers Snapchat's own small menu next to the message (it looks
+   like the real app), so its size and place are kept: it only gets a dim backdrop, a dark rounded look, finger-sized
+   rows, and gestures.js nudges it back on screen (Snapchat places it for a mouse: left can be negative).
+   gestures.js marks it [data-dg-actionmenu] the moment it is added to #portal-container (a :has() selector did
+   this before, but it slowed down every page update, 2026-09-22). */
+html.dg-glass [data-dg-actionmenu] {
+  position: fixed !important; inset: 0 !important; z-index: 2147483000 !important; background: rgba(0, 0, 0, 0.4) !important;
+}
+html.dg-glass [data-dg-actionmenu] > div { display: flex !important; flex-direction: column !important; gap: 8px !important; width: max-content !important; max-width: calc(100vw - 24px) !important; }
+html.dg-glass [data-dg-actionmenu] > div > div {
+  background: #232325 !important; border: 0 !important; border-radius: 16px !important; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55) !important;
+  overflow: hidden !important; box-sizing: border-box !important; margin: 0 !important;
+}
+html.dg-glass [data-dg-actionmenu] ul {
+  display: flex !important; flex-wrap: nowrap !important; align-items: center !important; gap: 2px !important;
+  margin: 0 !important; padding: 6px 8px !important; list-style: none !important;
+}
+html.dg-glass [data-dg-actionmenu] ul > li { margin: 0 !important; padding: 0 !important; }
+html.dg-glass [data-dg-actionmenu] ul > li > button {
+  width: 54px !important; height: 54px !important; min-width: 0 !important; padding: 0 !important; margin: 0 !important;
+  background: none !important; border: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important;
+}
+html.dg-glass [data-dg-actionmenu] ul > li > button > img { max-height: 46px !important; max-width: 46px !important; width: auto !important; height: auto !important; }
+html.dg-glass [data-dg-actionmenu] > div > [data-dg-am-actions] { align-self: flex-start !important; min-width: 250px !important; }
+html.dg-glass [data-dg-actionmenu] > div > [data-dg-am-actions] > div {
+  display: flex !important; align-items: center !important; gap: 12px !important; min-height: 56px !important; padding: 0 18px !important;
+  box-sizing: border-box !important; border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+html.dg-glass [data-dg-actionmenu] > div > [data-dg-am-actions] > div:first-child { border-top: 0 !important; }
+html.dg-glass [data-dg-actionmenu] > div > [data-dg-am-actions] > div span { font-size: 20px !important; line-height: 1.2 !important; }
+html.dg-glass [data-dg-actionmenu] > div > [data-dg-am-actions] > div svg { width: 25px !important; height: 25px !important; flex: 0 0 25px !important; }
+
+/* Dragging a chat open / closed (gestures.js "peek"): both panes show, the list underneath, the chat on top
+   following the finger (glass.css skips its display:none while data-dg-peek is set). The slide-in animation is
+   off because the finger is doing the moving. */
+html.dg-glass[data-dg-peek] [data-dg-sidebar] { z-index: 1; }
+html.dg-glass[data-dg-peek] :is([data-dg-column], [data-dg-root] > :not([data-dg-sidebar])) { /* (also a freshly re-rendered pane before glass.js marks it) */
+  animation: none !important; position: relative; z-index: 2;
+  transform: translate3d(var(--dg-peek-x, 0px), 0, 0) !important; transition: var(--dg-peek-tr, none) !important;
+  will-change: transform; box-shadow: 0 0 28px rgba(0, 0, 0, 0.6);
+}

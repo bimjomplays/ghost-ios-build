@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- Test harness for Ghost 8 Ball (not bundled into the app): opens the game for one player with a stand-in games
+     framework, so the Playwright rig can play shots headlessly and take phone-size screenshots.
+     ?me=ana&seed=42  -  window.PH exposes { game, view, state, send(move) } -->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>8 Ball harness</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0f141c; }
+  #app { position: fixed; inset: 0; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="pool8-engine.js"></script>
+<script src="pool8.js"></script>
+<script>
+  const q = new URLSearchParams(location.search);
+  const me = q.get("me") || "ana";
+  const game = window.GhostPool8;
+  const PH = window.PH = { game, moves: [] };
+  PH.state = game.newGame({ players: ["ana", "ben"], seed: Number(q.get("seed") || 42) });
+  PH.start = (state) => {
+    if (PH.view) PH.view.destroy();
+    if (state) PH.state = state;
+    PH.view = game.view(document.getElementById("app"), {
+      state: PH.state, me, names: { ana: "Ana", ben: "Ben" },
+      onMove: (m) => { PH.moves.push(m); PH.state = game.apply(PH.state, m, me); },
+      onClose: () => { PH.closed = true; },
+    });
+  };
+  // the friend's move arriving from the other phone
+  PH.receive = (move, by) => { PH.state = game.apply(PH.state, move, by); PH.view.update(PH.state); };
+  PH.start();
+</script>
+</body>
+</html>

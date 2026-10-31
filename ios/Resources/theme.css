@@ -1,0 +1,25 @@
+/* theme.js sets the --dg-* colour custom properties and these attribute/class flags. Every rule here is
+   gated on a non-default value, so with the default settings (no attribute set) nothing here matches
+   anything and the page looks exactly as it did before this file existed. */
+
+/* reduce motion: same selectors touch.js's own <style> uses for the chat slide-in / list fade-in, so this
+   just needs to load after it (see report for the App.swift script/CSS order) to win the tie. */
+html.dg-reduce-motion [data-dg-column],
+html.dg-reduce-motion [data-dg-sidebar] {
+  animation: none !important;
+}
+
+/* hide clutter: My AI row in the chat list (the search-field shortcut button is already always hidden by
+   glass.js, unconditionally - this only reaches the row) */
+html[data-dg-hide-myai] [data-dg-myai-row] {
+  display: none !important;
+}
+
+/* hide clutter: Snapchat's own promo banners. glass.js already hides these unconditionally too, so with
+   the default (on) this is a harmless no-op double-hide; turning the setting off can't currently un-hide
+   them (glass.js isn't ours to gate) - see report. */
+html[data-dg-hide-banners] [data-dg-banner] {
+  display: none !important;
+}
+/* the chat-loading shimmer (touch.js) is a ::after of the pane: the element rules above don't reach it */
+html.dg-reduce-motion [data-dg-column]::after { animation: none !important; }

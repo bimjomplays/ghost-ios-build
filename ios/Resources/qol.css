@@ -1,0 +1,57 @@
+/* Chats/QoL UI (qol.js). Everything here is a brand-new element or an attribute qol.js only sets when
+   there is a nickname/scroll position/voice note to show, so none of it changes the default look. */
+
+/* ---- quick replies row (position/size set by qol.js from the composer's rect) ---- */
+.dg-qr-row {
+  position: fixed; z-index: 40; display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  padding: 8px 12px; box-sizing: border-box; background: var(--dg-surface-2, #1c1c1e);
+  transform: translateY(-1px); /* sits flush against the composer panel above it */
+}
+.dg-qr-row::-webkit-scrollbar { display: none; }
+.dg-qr-chip {
+  flex: 0 0 auto; border: 0; border-radius: 999px; padding: 8px 16px; margin: 0;
+  background: var(--dg-surface-3, #2c2c2e); color: var(--dg-text, #fff);
+  font: 600 15px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap;
+}
+.dg-qr-chip:active { background: var(--dg-accent, #0fadff); }
+
+/* ---- private nicknames: hide the real name's children (keeps its box/measurements) and show the
+   nickname via ::before, at the same font-size/line-height qol.js read off the real (already
+   textscale.js-scaled) text ---- */
+[data-dg-nick] { position: relative; }
+[data-dg-nick] > * { visibility: hidden !important; }
+/* a real name that is a bare text node (no child element) must disappear too, or both names overlap */
+[data-dg-nick] { color: transparent !important; }
+[data-dg-nick]::before {
+  content: attr(data-dg-nick);
+  position: absolute; inset: 0 auto 0 0; width: max-content; max-width: 62vw; visibility: visible; /* may be longer than the real name */
+  display: flex; align-items: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: var(--dg-nick-fs, inherit); line-height: var(--dg-nick-lh, inherit); font-weight: inherit;
+  color: var(--dg-text, #ffffff) !important; /* the box itself is transparent (hides the real name) */
+}
+
+/* ---- scroll-to-bottom button (an open chat, scrolled up more than ~1.5 screens) ---- */
+.dg-scrollbtn {
+  position: fixed; right: 14px; bottom: 90px; z-index: 30; width: 44px; height: 44px; border: 0; border-radius: 50%;
+  background: var(--dg-surface-3, #2c2c2e); color: var(--dg-text, #fff);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  opacity: 0; transform: scale(0.6); pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dg-scrollbtn.dg-scrollbtn-show { opacity: 1; transform: scale(1); pointer-events: auto; }
+.dg-scrollbtn-dotel { display: none; }
+.dg-scrollbtn.dg-scrollbtn-dot .dg-scrollbtn-dotel {
+  display: block; position: absolute; top: 4px; right: 4px; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--dg-accent, #0fadff); box-shadow: 0 0 0 2px var(--dg-surface-3, #2c2c2e);
+}
+html.dg-reduce-motion .dg-scrollbtn { transition: none !important; }
+
+/* ---- voice-note playback-speed pill (next to Snapchat's own <audio controls>) ---- */
+.dg-vn-pill {
+  display: inline-flex; align-items: center; justify-content: center; margin-left: 8px; vertical-align: middle;
+  min-width: 34px; height: 26px; padding: 0 8px; border: 0; border-radius: 13px;
+  background: var(--dg-surface-3, #2c2c2e); color: var(--dg-text, #fff);
+  font: 700 12px/1 -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.dg-vn-pill:active { background: var(--dg-accent, #0fadff); }

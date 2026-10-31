@@ -1,0 +1,247 @@
+/* GIF picker (gif-picker.js): a Discord-style bottom sheet over the chat. iOS-app only (a bottom sheet is a
+   mobile pattern, like chat.css/header.css/etc.) - loaded by App.swift's cssScript list, not by
+   build-userscripts.py, so it never reaches the desktop Safari userscript build. */
+.dg-gif-button {
+  font: 700 11px/1 -apple-system, system-ui, sans-serif !important;
+  letter-spacing: 0.04em;
+  color: #b4b4c2 !important;
+}
+
+.dg-gif-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.dg-gif-backdrop.dg-open { opacity: 1; }
+
+.dg-gif-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+}
+
+.dg-gif-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 78dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--dg-bg, #121212);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -10px 32px rgba(0, 0, 0, 0.55);
+  color: #f2f2f7;
+  font: 13px/1.4 -apple-system, system-ui, sans-serif;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+  padding-bottom: max(4px, env(safe-area-inset-bottom));
+}
+.dg-gif-sheet.dg-open { transform: translateY(0); }
+.dg-gif-sheet.dg-dragging { transition: none; }
+
+.dg-gif-draghandle {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 4px;
+  touch-action: none;
+  cursor: grab;
+}
+.dg-gif-grabber {
+  width: 36px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.dg-gif-search-row { padding: 0 14px 8px; flex-shrink: 0; }
+.dg-gif-search-wrap { position: relative; }
+.dg-gif-search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 34px 10px 14px;
+  border-radius: 12px;
+  border: 0;
+  background: var(--dg-surface, #1e1e1e);
+  color: #f2f2f7;
+  font: 16px/1.3 -apple-system, system-ui, sans-serif; /* 16px: no iOS auto-zoom on focus */
+  outline: none;
+}
+.dg-gif-search::placeholder { color: #8f8f9e; }
+.dg-gif-search:focus { box-shadow: inset 0 0 0 1.5px var(--dg-accent, #0fadff); }
+.dg-gif-clear {
+  display: none;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #d0d0da;
+  font-size: 12px;
+}
+.dg-gif-search-wrap.dg-has-text .dg-gif-clear { display: block; }
+
+.dg-gif-tabs {
+  flex-shrink: 0; /* the results grid below must not squeeze the tab row (it did with a long result list) */
+  display: flex;
+  gap: 8px;
+  padding: 0 14px 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.dg-gif-tabs::-webkit-scrollbar { display: none; }
+.dg-gif-tabs button {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--dg-surface, #1e1e1e);
+  color: #b4b4c2;
+  font: 600 13px/1.3 -apple-system, system-ui, sans-serif;
+}
+.dg-gif-tabs button.dg-on { background: var(--dg-accent, #0fadff); color: #fff; }
+
+.dg-gif-body {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 10px 4px;
+}
+
+/* Home: category tiles (a still Giphy frame per category, name over a dark gradient) */
+.dg-gif-cats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.dg-gif-cat {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--dg-surface, #1e1e1e);
+}
+.dg-gif-cat::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.78) 100%);
+}
+.dg-gif-cat img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.dg-gif-cat img.dg-loaded { opacity: 1; }
+.dg-gif-cat span {
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  z-index: 1;
+  color: #fff;
+  font: 700 13px/1.2 -apple-system, system-ui, sans-serif;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* Results / favourites / recents: 2-column masonry, shortest column filled first so it only grows downward */
+.dg-gif-results { display: flex; gap: 6px; align-items: flex-start; }
+.dg-gif-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.dg-gif-tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--dg-surface, #1e1e1e);
+}
+.dg-gif-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.dg-gif-tile img.dg-loaded { opacity: 1; }
+.dg-gif-tile.dg-gif-busy { opacity: 0.45; }
+.dg-gif-sentinel { height: 1px; }
+
+/* skeleton shimmer, GPU-cheap (background-position + opacity only) */
+.dg-gif-skel {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, #1a1a1a 30%, #262626 50%, #1a1a1a 70%);
+  background-size: 200% 100%;
+  animation: dg-gif-shimmer 1.15s ease-in-out infinite;
+}
+@keyframes dg-gif-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.dg-gif-fav {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 28px;
+  height: 28px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 15px;
+  line-height: 28px;
+}
+.dg-gif-fav.dg-on { color: #ffd23f; }
+
+.dg-gif-note {
+  padding: 30px 16px;
+  text-align: center;
+  color: #b4b4c2;
+  font: 13px/1.5 -apple-system, system-ui, sans-serif;
+}
+.dg-gif-retry {
+  margin-top: 10px;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--dg-accent, #0fadff);
+  color: #fff;
+  font: 600 13px/1 -apple-system, system-ui, sans-serif;
+}
+
+.dg-gif-keycard {
+  margin: 8px 4px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--dg-surface, #1e1e1e);
+  color: #e6e6ef;
+}
+.dg-gif-keycard p { margin: 0 0 10px; font: 13px/1.5 -apple-system, system-ui, sans-serif; color: #d0d0da; }
+.dg-gif-keycard .dg-gif-search { margin: 0; }
+
+.dg-gif-credit {
+  flex-shrink: 0;
+  padding: 8px 14px calc(6px + max(0px, env(safe-area-inset-bottom)));
+  text-align: center;
+  font-size: 10px;
+  color: #8f8f9e;
+}

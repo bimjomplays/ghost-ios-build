@@ -1,0 +1,134 @@
+/* Chat list header like the app: [Bitmoji][search] ......Chat...... [bell][add friend][more], all 50px
+   circles on one line. Bell and "more" are decoration (header.js adds them); the rest are Snapchat's own. */
+html.dg-glass.dg-list [data-dg-apphead] {
+  min-height: 72px !important; height: 72px !important; padding: 0 12px !important; box-sizing: border-box !important;
+  display: flex !important; align-items: center !important; box-shadow: none !important; border: 0 !important;
+}
+html.dg-glass.dg-list [data-dg-apphead]::after { font: 600 25px/1 -apple-system, BlinkMacSystemFont, sans-serif !important; }
+/* your Bitmoji */
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child button:has(img) {
+  width: 50px !important; height: 50px !important; padding: 0 !important; margin: 0 !important; border-radius: 50% !important;
+  background: #2b2b2b !important; box-shadow: none !important; position: relative !important; overflow: visible !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+}
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child button:has(img) > div:has(> img) { width: 50px !important; height: 50px !important; }
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child button:has(img) > svg { display: none !important; }
+/* search: a 50px circle right next to it, icon dead centre */
+html.dg-glass.dg-list [data-dg-sidebar] :has(> [data-dg-pill]) {
+  top: 11px !important; left: 72px !important; width: 50px !important; height: 50px !important;
+}
+html.dg-glass.dg-list [data-dg-pill] {
+  width: 50px !important; height: 50px !important; border-radius: 25px !important; background: #2b2b2b !important;
+  box-shadow: none !important; justify-content: flex-start !important;
+}
+html.dg-glass.dg-list [data-dg-pill] > :first-child {
+  flex: 0 0 50px !important; width: 50px !important; height: 50px !important; gap: 0 !important;
+}
+html.dg-glass.dg-list [data-dg-pill]:not(:focus-within) > :first-child > svg {
+  position: absolute !important; left: 50% !important; top: 50% !important; margin: 0 !important;
+  transform: translate(-50%, -50%) scale(1.5) !important;
+}
+html.dg-glass.dg-list [data-dg-pill]:not(:focus-within) > :first-child > svg path { fill: #fff !important; }
+html.dg-glass.dg-list [data-dg-pill]:not(:focus-within) input { width: 50px !important; height: 50px !important; }
+html.dg-glass.dg-list [data-dg-sidebar] :has(> [data-dg-pill]:focus-within) { left: 12px !important; right: 74px !important; width: auto !important; }
+html.dg-glass.dg-list:has([data-dg-pill]:focus-within) [data-dg-apphead] > div:first-child,
+html.dg-glass.dg-list:has([data-dg-pill]:focus-within) [data-dg-apphead]::after { display: none !important; }
+html.dg-glass.dg-list [data-dg-pill]:focus-within { width: 100% !important; }
+html.dg-glass.dg-list [data-dg-pill]:focus-within { box-shadow: none !important; border: 0 !important; outline: none !important; }
+html.dg-glass.dg-list [data-dg-pill]:focus-within > :first-child {
+  flex: 1 1 auto !important; width: auto !important; padding: 0 18px !important; gap: 10px !important;
+  justify-content: flex-start !important; align-items: center !important;
+}
+html.dg-glass.dg-list [data-dg-pill]:focus-within > :first-child > svg { position: static !important; transform: scale(1.2) !important; flex: 0 0 auto !important; }
+html.dg-glass.dg-list [data-dg-pill]:focus-within > :first-child > svg path { fill: var(--dg-text-secondary, #999) !important; }
+html.dg-glass.dg-list [data-dg-pill]:focus-within > :first-child > div { flex: 1 1 auto !important; min-width: 0 !important; display: flex !important; align-items: center !important; height: 50px !important; }
+html.dg-glass.dg-list [data-dg-pill]:focus-within input {
+  position: static !important; width: 100% !important; height: 50px !important; opacity: 1 !important; padding: 0 !important;
+  margin: 0 !important; line-height: 50px !important; background: none !important; border: 0 !important; outline: none !important;
+}
+/* close-search button (header.js adds it; tapping it just takes the focus away, which closes the field) */
+.dg-search-close { display: none; }
+html.dg-glass.dg-list:has([data-dg-pill]:focus-within) .dg-search-close {
+  display: flex; position: fixed; top: 11px; right: 12px; width: 50px; height: 50px; border-radius: 50%;
+  background: #2b2b2b; align-items: center; justify-content: center; z-index: 8;
+}
+/* right side: bell (fake), add friend (real, yellow), more (fake) */
+html.dg-glass.dg-list [data-dg-apphead] button[title="View friend requests"] {
+  position: absolute !important; right: 70px !important; top: 11px !important; width: 50px !important; height: 50px !important;
+  border-radius: 50% !important; background: #fffc00 !important; margin: 0 !important; padding: 0 !important;
+  display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: none !important;
+}
+html.dg-glass.dg-list [data-dg-apphead] button[title="View friend requests"] svg { transform: scale(1.2) !important; }
+html.dg-glass.dg-list [data-dg-apphead] button[title="View friend requests"] svg path { fill: #000 !important; }
+.dg-fake { display: none; }
+html.dg-glass.dg-list:not(.dg-stories):not(.dg-camera) .dg-fake {
+  display: flex; position: fixed; top: 11px; width: 50px; height: 50px; border-radius: 50%; background: #2b2b2b;
+  align-items: center; justify-content: center; z-index: 4; pointer-events: none;
+}
+html.dg-glass.dg-list:has([data-dg-column] form [role="searchbox"]) .dg-fake,
+html.dg-glass.dg-list:has([data-dg-pill]:focus-within) .dg-fake,
+html.dg-glass.dg-list:has([data-dg-pill]:focus-within) [data-dg-apphead] button[title="View friend requests"] { display: none !important; }
+.dg-fake-bell { right: 128px; }
+.dg-fake-more { right: 12px; }
+/* Look setting "hideHeaderIcons": hides the decorative bell only - the "..." (dg-fake-more) opens the
+   native settings sheet and must never be hideable. */
+html[data-dg-hide-bell] .dg-fake-bell { display: none !important; }
+/* Snapchat hides these two on narrow windows */
+html.dg-glass.dg-list [data-dg-apphead] div:has(> button[title="View friend requests"]) { display: block !important; position: static !important; }
+html.dg-glass.dg-list [data-dg-apphead] button[title="View friend requests"] { visibility: visible !important; opacity: 1 !important; }
+html.dg-glass.dg-list [data-dg-sidebar] :has(> [data-dg-pill]) { display: block !important; }
+
+/* the Snapchat ghost in the middle of Snapchat's header: gone (the "Chat" title takes its place) */
+html.dg-glass.dg-list [data-dg-apphead] > div:has(> svg:only-child),
+html.dg-glass.dg-list [data-dg-apphead] > div:has(> svg):not(:has(button)) { display: none !important; }
+/* your Bitmoji: pinned to the same line as the other circles */
+html.dg-glass.dg-list [data-dg-apphead] { position: relative !important; }
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child {
+  position: absolute !important; left: 12px !important; top: 11px !important; width: 50px !important; height: 50px !important;
+  margin: 0 !important; padding: 0 !important;
+}
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child div:not(:has(> img)):not([role="listbox"]):not([role="listbox"] *) {
+  margin: 0 !important; padding: 0 !important; width: 50px !important; height: 50px !important;
+}
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child button:has(img) img { width: 50px !important; height: 50px !important; }
+
+/* settings menu under your Bitmoji: a readable dark card */
+html.dg-glass.dg-list [data-dg-apphead] { z-index: 9 !important; overflow: visible !important; }
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child { overflow: visible !important; }
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child [role="listbox"]:not(:empty) {
+  position: absolute !important; top: 58px !important; left: 0 !important; width: 320px !important; max-width: 80vw !important;
+  height: auto !important; max-height: 70vh !important; overflow-y: auto !important; margin: 0 !important; padding: 8px 0 !important;
+  background: var(--dg-surface, #1e1e1e) !important; border: 1px solid rgba(255, 255, 255, 0.08) !important; border-radius: 16px !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55) !important; z-index: 60 !important; display: block !important;
+}
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child [role="listbox"] * {
+  outline: none !important; box-shadow: none !important; border-color: transparent !important; max-width: none !important;
+}
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child [role="listbox"] :is([role="option"], li, a, button) {
+  display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 12px !important;
+  width: 100% !important; height: auto !important; min-height: 48px !important; padding: 8px 18px !important;
+  margin: 0 !important; box-sizing: border-box !important; white-space: nowrap !important; background: none !important;
+  color: var(--dg-text, #fff) !important; text-align: left !important; position: static !important;
+}
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child [role="listbox"] :is(span, div) {
+  white-space: nowrap !important; width: auto !important; height: auto !important; position: static !important;
+  font-size: 19px !important; line-height: 24px !important;
+}
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child [role="listbox"] svg { flex: 0 0 auto !important; position: static !important; }
+
+/* the search button sits over the header row: keep it on top so taps reach it */
+html.dg-glass.dg-list [data-dg-sidebar] :has(> [data-dg-pill]) { z-index: 12 !important; }
+/* settings menu rows (real structure: [role=option] > div|a > label [+ value / icon]) */
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child [role="listbox"] [role="option"] { padding: 0 !important; min-height: 0 !important; display: block !important; }
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child [role="listbox"] [role="option"] > :is(div, a) {
+  display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 14px !important;
+  width: 100% !important; min-height: 50px !important; padding: 6px 18px !important; box-sizing: border-box !important;
+  color: #fff !important; text-decoration: none !important; visibility: visible !important;
+}
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child [role="listbox"] [role="option"] > div > div:nth-child(2) span { color: var(--dg-text-secondary, #999) !important; }
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child [role="listbox"] [role="option"]:last-child span { color: #f23c57 !important; }
+html.dg-glass.dg-list [data-dg-apphead] > div:first-child [role="listbox"] svg path { fill: var(--dg-text-secondary, #999) !important; }
+/* New Chat sheet open: the add-friend button (forced visible above) goes away with the rest of the header */
+html.dg-glass.dg-list:has([data-dg-column] form [role="searchbox"]) [data-dg-apphead] button[title="View friend requests"] {
+  display: none !important; visibility: hidden !important;
+}
