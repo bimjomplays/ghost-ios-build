@@ -1,0 +1,77 @@
+# Tooling-only recovery. Never build, archive, sign an app, upload or allocate a build.
+name: ios-recover
+on:
+  workflow_dispatch:
+    inputs:
+      expected_commit:
+        type: string
+        required: true
+        description: Exact public tooling commit approved for verify-only recovery of 1.19.9 (1003)
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: ios-recover-1003
+  cancel-in-progress: false
+jobs:
+  verify-existing:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: testflight
+    steps:
+      - name: Require the explicit immutable public tooling commit
+        env:
+          EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
+        run: |
+          [ "$GITHUB_SHA" = "$EXPECTED_COMMIT" ]
+          [ "$GITHUB_REPOSITORY" = 'bimjomplays/ghost-ios-build' ]
+          [ "$REPOSITORY_PRIVATE" = false ]
+      - uses: actions/checkout@v4
+        with:
+          path: tooling
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 4f9ca6345fdd22fe51c6b29e1934c2038a4eb0aa
+          path: uploaded
+          persist-credentials: false
+      - name: Authenticate original failed run and exact step results
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/bimjomplays/ghost-ios-build/actions/runs/41253228621 > original-run.json
+          gh api 'repos/bimjomplays/ghost-ios-build/actions/runs/41253228621/attempts/1/jobs?per_page=100' > original-jobs.json
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 41253228621
+          name: build-receipt
+          path: original-native
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify only the existing uploaded build and original release notes
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_APP_ID: ${{ vars.ASC_APP_ID }}
+        run: |
+          # Use the existing protected API credential, not app signing/provisioning.
+          for name in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8 ASC_APP_ID; do
+            [ -n "${!name}" ] || { echo "::error::Missing $name in testflight environment"; exit 1; }
+          done
+          umask 077
+          mkdir -p "$RUNNER_TEMP/asc"
+          printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/asc/key.p8"
+          python3 -I tooling/ci/recovery.py uploaded original-native/build-receipt.json original-run.json original-jobs.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: testflight-receipt
+          path: uploaded/testflight-receipt.json
+          if-no-files-found: error
+      - name: Remove ephemeral API key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/asc"

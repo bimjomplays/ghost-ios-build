@@ -5,6 +5,12 @@ from pathlib import Path
 import math
 import os
 import re
+import plistlib
+
+# XcodeGen's exact semantic Info.plist for the pinned project.yml (including
+# its standard app defaults). Formatting/order may differ across hosts; values
+# may not. Do not exempt arbitrary generated plists or change the app pin.
+GLASS_GENERATED_INFO_DIGEST = '4fbee009b7bf091076a891913cd503b9743dddcede7745c7bea876e271976c31'
 
 # One owner-authorized release, not a general release override. App bytes are
 # the scoped Glass candidate; tooling/CI may change without changing that app.
@@ -19,6 +25,13 @@ def json_digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
 
 
+class UniquePlist(dict):
+    def __setitem__(self, key, value):
+        if key in self:
+            raise ValueError('duplicate generated plist key')
+        super().__setitem__(key, value)
+
+
 def application_digest(root):
     h = hashlib.sha256()
     for f in sorted(root.rglob('*')):
@@ -31,6 +44,14 @@ def application_digest(root):
             if f.is_symlink():
                 raise ValueError('symlink in application scope')
             if f.is_file():
+                if rel == 'ios/Sources/Info.plist':
+                    try:
+                        valid = json_digest(plistlib.loads(f.read_bytes(), dict_type=UniquePlist)) == GLASS_GENERATED_INFO_DIGEST
+                    except (ValueError, TypeError, plistlib.InvalidFileException):
+                        valid = False
+                    if not valid:
+                        raise ValueError('unexpected generated Info.plist for the exact Glass-only application')
+                    continue
                 h.update(rel.encode() + b'\0' + f.read_bytes())
     return h.hexdigest()
 
